@@ -1,10 +1,14 @@
 export default function Creator() {
     return <>
         <div className="container">
-            <form>
+            <form className="row col-10 mx-auto">
                 <div >
-                    <label className="form-label">Title</label>
-                    <input className="form-control" id="title" />
+                    <label className="form-label"><h4 className="mb-0">Title</h4></label>
+                    <input className="form-control" id="title" placeholder="Some fancy title ;)" />
+                </div>
+                <div>
+                    <label className="form-label"><h4 className="mb-0">Post</h4></label>
+                    <textarea className="form-control" rows={5}></textarea>
                 </div>
             </form>
         </div>
