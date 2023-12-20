@@ -1,32 +1,24 @@
+import axios from 'axios';
+
 export default function Creator() {
+    function submitPost(title, post, author = "Anonymous") {
+        axios.post("http://localhost:3000/create", { title: title, post: post, author: author });
+    }
     return <>
         <div className="container">
-            <form className="row col-10 mx-auto">
-                <div >
-                    <label className="form-label"><h4 className="mb-0">Title</h4></label>
-                    <input className="form-control" id="title" placeholder="Some fancy title ;)" />
+            <h1 className="row col-10 mx-auto my-4">Create New Post</h1>
+            <form className="row-3 col-10 mx-auto">
+                <div className="form-floating mb-4">
+                    <input className="form-control border border-secondary" id="title" placeholder="" />
+                    <label className="ms-2">Title</label>
                 </div>
-                <div>
-                    <label className="form-label"><h4 className="mb-0">Post</h4></label>
-                    <textarea className="form-control" rows={5}></textarea>
+
+                <div className="form-floating mt-3">
+                    <textarea className="form-control border border-secondary" id="post" style={{ height: "40vh" }} placeholder=""></textarea>
+                    <label className="ms-2">Post</label>
                 </div>
+                <input type="submit" value={"Submit"} className="btn btn-primary m-3 ms-0" />
             </form>
         </div>
-        {/* <form>
-            <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Email address</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
-                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-            </div>
-            <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Password</label>
-                <input type="password" class="form-control" id="exampleInputPassword1" />
-            </div>
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1" />
-                <label class="form-check-label" for="exampleCheck1">Check me out</label>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form> */}
     </>;
 };

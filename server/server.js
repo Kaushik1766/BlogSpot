@@ -4,7 +4,7 @@ import pg from 'pg';
 
 const app = express();
 app.use(cors());
-const port = 3000;
+const port = 3001;
 app.use(express.json());
 
 const db = new pg.Client({
@@ -39,7 +39,11 @@ app.post("/del", async (req, res) => {
     await db.query(`delete from blog where id = ${req.body.id};`);
     res.send();
 });
-
+app.post('/create', async (req, res) => {
+    console.log(req.body);
+    // await db.query(`insert into blog (title, post, author) values ('${req.body.title}','${req.body.post}','${req.body.author}')`);
+    res.send();
+});
 app.listen(port, () => {
     console.log(`Server started on port ${port}`);
 });
