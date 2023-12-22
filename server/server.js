@@ -3,6 +3,8 @@ import cors from 'cors';
 import pg from 'pg';
 import bodyParser from "body-parser";
 import bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
+
 
 const saltRounds = 4;
 const app = express();
@@ -41,24 +43,34 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
     let { username, password } = req.body;
-    let hashedPassword = ((await db.query(`select * from users where username = '${username}' `)).rows[0]);
-
-    if (hashedPassword == null) {
-        res.send("user not registered");
+    let prevId = (await db.query(`select sessionid from users where username = '${username}'`)).rows[0];
+    console.log(prevId);
+    if (prevId != null && prevId.sessionid == req.headers.cookie?.split('=')[1]) {
+        res.send("already logged in");
     }
     else {
-        bcrypt.compare(password, hashedPassword.password, (err, result) => {
-            if (err) {
-                console.log(err);
-                res.send("Error occured");
-            }
-            if (result == false) {
-                res.send("Wrong password");
-            }
-            else {
-                res.send("Logged in successfully.");
-            }
-        })
+        let hashedPassword = ((await db.query(`select * from users where username = '${username}' `)).rows[0]);
+
+        if (hashedPassword == null) {
+            res.send("user not registered");
+        }
+        else {
+            bcrypt.compare(password, hashedPassword.password, async (err, result) => {
+                if (err) {
+                    console.log(err);
+                    res.send("Error occured");
+                }
+                if (result == false) {
+                    res.send("Wrong password");
+                }
+                else {
+                    const sessionId = uuidv4();
+                    await db.query(`update users set sessionid = '${sessionId}' where username = '${username}'`);
+                    res.cookie('session', sessionId, { maxAge: 900000 });
+                    res.send("Logged in successfully.");
+                }
+            })
+        }
     }
 })
 
