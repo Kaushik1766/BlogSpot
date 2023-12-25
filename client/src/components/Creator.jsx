@@ -10,7 +10,7 @@ export default function Creator() {
             axios.post("http://localhost:3000/create", { title: content.title, post: content.post, author: "Anonymous" });
             console.log(content);
             if (window.confirm("Post Created successfully...\nPress OK to go to Home\nPress Cancel to Create new post")) {
-                window.location.replace('/');
+                window.location.href = '/';
             }
             else {
                 window.location.reload();
@@ -25,6 +25,7 @@ export default function Creator() {
     function handleChange(event) {
         let { name, value } = event.target;
         updateContent((prevContent) => ({ ...prevContent, [name]: value }));
+        console.log(content);
     }
     return <>
         <div className="container">

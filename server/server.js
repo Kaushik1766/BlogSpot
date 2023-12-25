@@ -10,7 +10,7 @@ const saltRounds = 4;
 const app = express();
 app.use(cors());
 const port = 3000;
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 const db = new pg.Client({
     user: "postgres",
@@ -23,6 +23,7 @@ const db = new pg.Client({
 db.connect();
 
 app.post("/register", async (req, res) => {
+    console.log(req.body);
     let { username, password } = req.body;
     if ((await db.query(`select * from users where username = '${username}'`)).rows[0] == null) {
         bcrypt.hash(password, saltRounds, async (err, hashedPassword) => {
@@ -32,46 +33,58 @@ app.post("/register", async (req, res) => {
             }
             else {
                 await db.query(`insert into users(username, password) values('${username}','${hashedPassword}')`);
-                res.send("Registered successfully");
+                res.status(200);
+                res.send("Registered Successfully");
             }
         })
     }
     else {
+        res.status(500);
         res.send("username already taken");
     }
 });
 
 app.post("/login", async (req, res) => {
-    let { username, password } = req.body;
-    let prevId = (await db.query(`select sessionid from users where username = '${username}'`)).rows[0];
-    console.log(prevId);
-    if (prevId != null && prevId.sessionid == req.headers.cookie?.split('=')[1]) {
-        res.send("already logged in");
+    let user = '';
+    if (req.body.sessionID) {
+        let prevId = (await db.query(`select username from users where sessionID = '${req.body.sessionID}'`));
+        prevId = prevId.rows[0];
+        console.log(prevId);
+        if (prevId != null) {
+            user = prevId.username;
+            console.log(user);
+            res.send(user);
+        }
     }
-    else {
-        let hashedPassword = ((await db.query(`select * from users where username = '${username}' `)).rows[0]);
+    // let { username, password } = req.body;
 
-        if (hashedPassword == null) {
-            res.send("user not registered");
-        }
-        else {
-            bcrypt.compare(password, hashedPassword.password, async (err, result) => {
-                if (err) {
-                    console.log(err);
-                    res.send("Error occured");
-                }
-                if (result == false) {
-                    res.send("Wrong password");
-                }
-                else {
-                    const sessionId = uuidv4();
-                    await db.query(`update users set sessionid = '${sessionId}' where username = '${username}'`);
-                    res.cookie('session', sessionId, { maxAge: 900000 });
-                    res.send("Logged in successfully.");
-                }
-            })
-        }
-    }
+    // if (prevId != null && prevId.sessionid == req.headers.cookie?.split('=')[1]) {
+    //     res.send("already logged in");
+    // }
+    // else {
+    //     let hashedPassword = ((await db.query(`select * from users where username = '${username}' `)).rows[0]);
+
+    //     if (hashedPassword == null) {
+    //         res.send("user not registered");
+    //     }
+    //     else {
+    //         bcrypt.compare(password, hashedPassword.password, async (err, result) => {
+    //             if (err) {
+    //                 console.log(err);
+    //                 res.send("Error occured");
+    //             }
+    //             if (result == false) {
+    //                 res.send("Wrong password");
+    //             }
+    //             else {
+    //                 const sessionId = uuidv4();
+    //                 await db.query(`update users set sessionid = '${sessionId}' where username = '${username}'`);
+    //                 res.cookie('session', sessionId, { maxAge: 900000 });
+    //                 res.send("Logged in successfully.");
+    //             }
+    //         })
+    //     }
+    // }
 })
 
 app.get('/', (req, res) => {
