@@ -2,7 +2,7 @@ import express from "express";
 import cors from 'cors';
 import pg from 'pg';
 import bodyParser from "body-parser";
-import bcrypt from 'bcrypt';
+import bcrypt, { hash } from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -56,35 +56,35 @@ app.post("/login", async (req, res) => {
             res.send(user);
         }
     }
-    // let { username, password } = req.body;
+    console.log(req.body);
+    let { username, password } = req.body;
+    let hashedPassword = ((await db.query(`select password from users where username = '${username}' `)).rows[0]);
+    if (hashedPassword == null) {
+        res.send('user not registered');
+    }
+    else {
+        hashedPassword = hashedPassword.password
+        bcrypt.compare(password, hashedPassword, async (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+            if (result == false) {
+                res.send('wrond password')
+            }
+            if (result == true) {
+                const sessionId = uuidv4();
+                await db.query(`update users set sessionid = '${sessionId}' where username = '${username}'`);
+                res.send(sessionId);
+            }
+        })
+    }
+})
 
-    // if (prevId != null && prevId.sessionid == req.headers.cookie?.split('=')[1]) {
-    //     res.send("already logged in");
-    // }
-    // else {
-    //     let hashedPassword = ((await db.query(`select * from users where username = '${username}' `)).rows[0]);
+app.post('/logout', async (req, res) => {
+    await db.query(`update users set sessionid = null where username = '${req.body.username}'`)
 
-    //     if (hashedPassword == null) {
-    //         res.send("user not registered");
-    //     }
-    //     else {
-    //         bcrypt.compare(password, hashedPassword.password, async (err, result) => {
-    //             if (err) {
-    //                 console.log(err);
-    //                 res.send("Error occured");
-    //             }
-    //             if (result == false) {
-    //                 res.send("Wrong password");
-    //             }
-    //             else {
-    //                 const sessionId = uuidv4();
-    //                 await db.query(`update users set sessionid = '${sessionId}' where username = '${username}'`);
-    //                 res.cookie('session', sessionId, { maxAge: 900000 });
-    //                 res.send("Logged in successfully.");
-    //             }
-    //         })
-    //     }
-    // }
+    // console.log(q);
+    res.send();
 })
 
 app.get('/', (req, res) => {

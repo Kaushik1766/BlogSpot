@@ -2,7 +2,8 @@ import * as Icon from 'react-bootstrap-icons';
 import Avatar from './Avatar';
 
 
-function Navbar(props) {
+function Navbar() {
+
     return <>
         <div className="container">
             <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
@@ -17,7 +18,7 @@ function Navbar(props) {
                     <li><a href="#" className="nav-link px-2 link-dark">FAQs</a></li>
                     <li><a href="#" className="nav-link px-2 link-dark">About</a></li>
                 </ul>
-                <Avatar user={props.user} setUser={props.setUser} />
+                <Avatar />
 
             </header>
         </div>

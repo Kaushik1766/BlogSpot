@@ -11,9 +11,7 @@ export default function Login() {
     }
     const [credentials, updateCredentials] = useState({ username: '', password: '' });
     async function login() {
-        if ((condition)) {
 
-        }
         let resp = await axios.post('http://localhost:3000/login', credentials).catch((error) => {
             console.log(error);
             return error.response;
