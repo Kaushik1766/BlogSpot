@@ -44,7 +44,7 @@ app.post("/register", async (req, res) => {
     }
 });
 
-app.post("/login", async (req, res) => {
+app.post('/session', async (req, res) => {
     let user = '';
     if (req.body.sessionID) {
         let prevId = (await db.query(`select username from users where sessionID = '${req.body.sessionID}'`));
@@ -56,6 +56,10 @@ app.post("/login", async (req, res) => {
             res.send(user);
         }
     }
+})
+
+app.post("/login", async (req, res) => {
+
     console.log(req.body);
     let { username, password } = req.body;
     let hashedPassword = ((await db.query(`select password from users where username = '${username}' `)).rows[0]);
@@ -69,7 +73,7 @@ app.post("/login", async (req, res) => {
                 console.log(err);
             }
             if (result == false) {
-                res.send('wrond password')
+                res.send('wrong password')
             }
             if (result == true) {
                 const sessionId = uuidv4();

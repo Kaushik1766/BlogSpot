@@ -13,7 +13,7 @@ function Avatar(props) {
     useEffect(() => {
         if (cookie.sessionID != null) {
             let returnedUser
-            axios.post('http://localhost:3000/login', { sessionID: cookie.sessionID }).then((resp) => {
+            axios.post('http://localhost:3000/session', { sessionID: cookie.sessionID }).then((resp) => {
                 returnedUser = resp
             }).then(() => {
                 // if (returnedUser.data != null) {

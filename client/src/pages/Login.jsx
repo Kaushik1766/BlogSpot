@@ -1,9 +1,16 @@
 import Navbar from "../components/Navbar";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import { useSelector } from "react-redux";
+
 
 export default function Login() {
+    let username = useSelector((state) => state.login.username)
+    console.log(username);
+    if (username != null) {
+        window.location.replace('/')
+    }
     const [cookies, updateCookies] = useCookies(['user']);
     // console.log(cookies.sessionID); 
     if (cookies.sessionID != null) {
@@ -16,7 +23,12 @@ export default function Login() {
             console.log(error);
             return error.response;
         });
-        window.alert(resp.data);
+        if (resp.data == 'user not registered' || resp.data == 'wrong password') {
+            window.alert(resp.data);
+        }
+        else {
+            updateCookies('sessionID', resp.data, { maxAge: 432000 })
+        }
         if (resp.status == 200) {
             window.location.href = '/login';
         }
